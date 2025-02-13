@@ -19,7 +19,7 @@ This is an example of an application where Django (for admin and ORM) and FastAP
     ```bash
     docker-compose up --build
     ```
-## Open:
+### Open:
 - FastAPI: [http://localhost:8000](http://localhost:8000) or even better here [http://localhost:8000/docs](http://localhost:8000/docs)
 - Django Admin: [http://localhost:8000/admin](http://localhost:8000/admin)  
    To create `django superuser` run in your terminal:
