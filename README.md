@@ -15,7 +15,7 @@ This is an example of an application where Django (for admin and ORM) and FastAP
 
 ## How to start
 - Install Docker and Docker Compose on your system if you do not have it.
-- Соберите и запустите контейнеры:
+- Run command:
     ```bash
     docker-compose up --build
     ```
