@@ -1,0 +1,65 @@
+services:
+  web:
+    build: .
+    command: bash -c "while ! nc -z db 5432; do sleep 1; done && python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && uvicorn fastapi_app.main:app --host 0.0.0.0 --port 8000"
+    volumes:
+      - .:/blockchain_monitor
+      - staticfiles:/blockchain_monitor/staticfiles
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6380:6379"
+
+  celery:
+    build: .
+    command: celery -A config.celery.app worker --loglevel=info
+    volumes:
+      - .:/blockchain_monitor
+    depends_on:
+      - redis
+      - db
+
+  beat:
+    build: .
+    command: celery -A config.celery.app beat --loglevel=info
+    volumes:
+      - .:/blockchain_monitor
+    depends_on:
+      - redis
+      - db
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
+  staticfiles:

@@ -1,0 +1,10 @@
+Django
+fastapi
+uvicorn
+celery
+redis
+requests
+pydantic
+python-multipart
+psycopg2-binary
+python-jose
